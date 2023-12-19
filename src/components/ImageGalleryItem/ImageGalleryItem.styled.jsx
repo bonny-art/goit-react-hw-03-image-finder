@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 
 export const ImageGalleryItemStyled = styled.li`
   width: calc((100% - 16px * 3) / 4);
-  /* height: calc((100vh - (72px + 40px + 24px + 16px * 4) + 1px) / 3); */
-  height: calc((100vh - (72px + 40px + 24px + 16px * 4)) / 3);
+  height: calc((100vh - (72px + 40px + 24px + 16px * 4) + 2px) / 3);
+  /* height: calc((100vh - (72px + 40px + 24px + 16px * 4)) / 3); */
   /* overflow: hidden; */
 
   border-radius: 2px;

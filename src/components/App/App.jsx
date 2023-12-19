@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { nanoid } from 'nanoid';
 
 import * as ImageService from 'services/image-service';
 
@@ -20,31 +21,32 @@ export class App extends Component {
     if (prev.query !== this.state.query || prev.page !== this.state.page) {
       this.getImages();
     }
-
-    if (prev.page !== this.state.page) {
-      console.log(`Scroll to page ${this.state.page}!!!`);
-      console.log('window.innerHeight :>> ', window.innerHeight);
-      window.scroll({
-        top: window.scrollY + 800,
-        // top: window.scrollY + (window.innerHeight - (72 + 40 + 24 + 16)),
-        behavior: 'smooth',
-      });
-    }
   }
 
   handleSearch = query => {
     this.setState({ query, images: [], page: 1, err: null });
   };
 
+  scrollDown = () => {
+    window.scroll({
+      top: window.scrollY + (window.innerHeight - (72 + 40 + 24 + 16)) + 2,
+      behavior: 'smooth',
+    });
+  };
+
   getImages = async () => {
     const { query, page } = this.state;
     try {
       const { hits, totalHits } = await ImageService.getImages(query, page);
-      this.setState(prev => ({
-        images: [...prev.images, ...hits],
-        isButtonVisible:
-          this.state.page < Math.ceil(totalHits / ImageService.PER_PAGE),
-      }));
+      hits.map(hit => (hit.id = nanoid()));
+      this.setState(
+        prev => ({
+          images: [...prev.images, ...hits],
+          isButtonVisible:
+            this.state.page < Math.ceil(totalHits / ImageService.PER_PAGE),
+        }),
+        () => this.scrollDown()
+      );
     } catch (error) {
       this.setState({ err: error });
     }
@@ -55,9 +57,6 @@ export class App extends Component {
   };
 
   toggleModal = () => {
-    // this.state.showModal && this.setState({ selectedImageId: '' });
-    // this.setState(({ showModal }) => ({ showModal: !showModal }));
-    console.log('toggleModal');
     this.setState(prevState => ({
       selectedImageId: prevState.showModal ? '' : prevState.selectedImageId,
       showModal: !prevState.showModal,
@@ -65,14 +64,11 @@ export class App extends Component {
   };
 
   showBigImage = id => {
-    console.log('showBigImage');
     this.setState({ selectedImageId: id }, () => this.toggleModal());
   };
 
   render() {
     const { images, showModal, isButtonVisible, selectedImageId } = this.state;
-
-    console.log('showModal :>> ', showModal);
 
     const selectedImage = images.find(image => image.id === selectedImageId);
 
