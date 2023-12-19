@@ -10,6 +10,7 @@ html {
   margin: 0;
   padding: 0;
   box-sizing: inherit;
+  line-height: 1;
 }
 
 body {
@@ -28,8 +29,8 @@ address {
 
 img {
   display: block;
-  width: 100%;
-  height: auto;
+  /* width: 100%;
+  height: auto; */
 }
 
 ul,

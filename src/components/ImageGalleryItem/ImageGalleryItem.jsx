@@ -4,10 +4,9 @@ import {
   ImageGalleryItemStyled,
 } from './ImageGalleryItem.styled';
 
-export const ImageGalleryItem = ({ smallImage, largeImage, tags }) => {
-  const showBigImage = () => {};
+export const ImageGalleryItem = ({ smallImage, id, tags, openModal }) => {
   return (
-    <ImageGalleryItemStyled onClick={() => showBigImage(largeImage)}>
+    <ImageGalleryItemStyled onClick={() => openModal(id)}>
       <ImageGalleryItemImageStyled src={smallImage} alt={tags} />
     </ImageGalleryItemStyled>
   );

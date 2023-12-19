@@ -1,15 +1,17 @@
 import styled from '@emotion/styled';
 
 export const ImageGalleryStyled = styled.ul`
-  display: grid;
-  max-width: calc(100vw - 48px);
-  /* grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); */
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-gap: 16px;
+  max-width: calc((100vh - 72px - 40px - 24px - 16px * 2) * 1.6);
+  /* max-width: 561px; */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
   margin-top: 0;
   margin-bottom: 0;
   padding: 0;
   list-style: none;
   margin-left: auto;
   margin-right: auto;
+  line-height: 1;
 `;

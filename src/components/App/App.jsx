@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 import * as ImageService from 'services/image-service';
 
-import { Searchbar, ImageGallery, Button } from 'components';
-import { AppStyled } from './App.styled';
+import { Searchbar, ImageGallery, Button, Modal } from 'components';
+import { AppStyled, BigImageStyled } from './App.styled';
 
 export class App extends Component {
   state = {
@@ -12,20 +12,31 @@ export class App extends Component {
     page: 1,
     err: null,
     isButtonVisible: false,
-  };
-
-  handleSearch = query => {
-    this.setState({ query, images: [], page: 1, err: null });
+    showModal: false,
+    selectedImageId: '',
   };
 
   componentDidUpdate(_, prev) {
     if (prev.query !== this.state.query || prev.page !== this.state.page) {
       this.getImages();
     }
+
+    if (prev.page !== this.state.page) {
+      console.log(`Scroll to page ${this.state.page}!!!`);
+      console.log('window.innerHeight :>> ', window.innerHeight);
+      window.scroll({
+        top: window.scrollY + 800,
+        // top: window.scrollY + (window.innerHeight - (72 + 40 + 24 + 16)),
+        behavior: 'smooth',
+      });
+    }
   }
 
+  handleSearch = query => {
+    this.setState({ query, images: [], page: 1, err: null });
+  };
+
   getImages = async () => {
-    // this.state.isButtonVisible = false;
     const { query, page } = this.state;
     try {
       const { hits, totalHits } = await ImageService.getImages(query, page);
@@ -43,13 +54,44 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
+  toggleModal = () => {
+    // this.state.showModal && this.setState({ selectedImageId: '' });
+    // this.setState(({ showModal }) => ({ showModal: !showModal }));
+    console.log('toggleModal');
+    this.setState(prevState => ({
+      selectedImageId: prevState.showModal ? '' : prevState.selectedImageId,
+      showModal: !prevState.showModal,
+    }));
+  };
+
+  showBigImage = id => {
+    console.log('showBigImage');
+    this.setState({ selectedImageId: id }, () => this.toggleModal());
+  };
+
   render() {
+    const { images, showModal, isButtonVisible, selectedImageId } = this.state;
+
+    console.log('showModal :>> ', showModal);
+
+    const selectedImage = images.find(image => image.id === selectedImageId);
+
     return (
-      <AppStyled>
-        <Searchbar onSubmit={this.handleSearch} />
-        <ImageGallery imageList={this.state.images} />
-        {this.state.isButtonVisible && <Button onClick={this.loadNextPage} />}
-      </AppStyled>
+      <>
+        <AppStyled>
+          <Searchbar onSubmit={this.handleSearch} />
+          <ImageGallery imageList={images} showBigImage={this.showBigImage} />
+          {isButtonVisible && <Button onClick={this.loadNextPage} />}
+        </AppStyled>
+        {showModal && selectedImageId && (
+          <Modal onClose={this.toggleModal}>
+            <BigImageStyled
+              src={selectedImage.largeImageURL}
+              alt={selectedImage.tags}
+            />
+          </Modal>
+        )}
+      </>
     );
   }
 }
