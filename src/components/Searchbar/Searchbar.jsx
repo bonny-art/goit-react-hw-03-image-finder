@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { createPortal } from 'react-dom';
 import {
   SearchbarStyled,
   SearchForm,
@@ -7,6 +8,8 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 import { MdOutlineImageSearch } from 'react-icons/md';
+
+const headerRoot = document.querySelector('#header-root');
 
 export class Searchbar extends Component {
   state = {
@@ -24,7 +27,7 @@ export class Searchbar extends Component {
   };
 
   render() {
-    return (
+    return createPortal(
       <SearchbarStyled>
         <SearchForm onSubmit={this.handleSubmit}>
           <SearchFormButton type="submit">
@@ -43,7 +46,8 @@ export class Searchbar extends Component {
             onChange={this.handleChange}
           />
         </SearchForm>
-      </SearchbarStyled>
+      </SearchbarStyled>,
+      headerRoot
     );
   }
 }

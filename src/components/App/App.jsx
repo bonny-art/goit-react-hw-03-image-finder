@@ -23,7 +23,7 @@ export class App extends Component {
 
     if (prev.page !== this.state.page) {
       console.log(`Scroll to page ${this.state.page}!!!`);
-      console.log('window.innerHeight :>> ', window.innerHeight);
+      // console.log('window.innerHeight :>> ', window.innerHeight);
       window.scroll({
         top: window.scrollY + 800,
         // top: window.scrollY + (window.innerHeight - (72 + 40 + 24 + 16)),
@@ -55,9 +55,6 @@ export class App extends Component {
   };
 
   toggleModal = () => {
-    // this.state.showModal && this.setState({ selectedImageId: '' });
-    // this.setState(({ showModal }) => ({ showModal: !showModal }));
-    console.log('toggleModal');
     this.setState(prevState => ({
       selectedImageId: prevState.showModal ? '' : prevState.selectedImageId,
       showModal: !prevState.showModal,
@@ -65,14 +62,11 @@ export class App extends Component {
   };
 
   showBigImage = id => {
-    console.log('showBigImage');
     this.setState({ selectedImageId: id }, () => this.toggleModal());
   };
 
   render() {
     const { images, showModal, isButtonVisible, selectedImageId } = this.state;
-
-    console.log('showModal :>> ', showModal);
 
     const selectedImage = images.find(image => image.id === selectedImageId);
 

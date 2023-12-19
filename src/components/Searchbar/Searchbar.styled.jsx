@@ -3,8 +3,9 @@ import styled from '@emotion/styled';
 export const SearchbarStyled = styled.header`
   top: 0;
   left: 0;
-  position: sticky;
+  position: fixed;
   /* z-index: 1100; */
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
