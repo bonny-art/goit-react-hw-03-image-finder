@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 
 import * as ImageService from 'services/image-service';
 
-import { Searchbar, ImageGallery, Button, Modal } from 'components';
+import { Searchbar, ImageGallery, Button, Modal, Loader } from 'components';
 import { AppStyled, BigImageStyled } from './App.styled';
 
 export class App extends Component {
@@ -15,6 +15,7 @@ export class App extends Component {
     isButtonVisible: false,
     showModal: false,
     selectedImageId: '',
+    isLoading: false,
   };
 
   componentDidUpdate(_, prev) {
@@ -36,6 +37,7 @@ export class App extends Component {
 
   getImages = async () => {
     const { query, page } = this.state;
+    this.setState({ isLoading: true });
     try {
       const { hits, totalHits } = await ImageService.getImages(query, page);
       hits.map(hit => (hit.id = nanoid()));
@@ -49,6 +51,8 @@ export class App extends Component {
       );
     } catch (error) {
       this.setState({ err: error });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
@@ -68,7 +72,8 @@ export class App extends Component {
   };
 
   render() {
-    const { images, showModal, isButtonVisible, selectedImageId } = this.state;
+    const { images, showModal, isButtonVisible, selectedImageId, isLoading } =
+      this.state;
 
     const selectedImage = images.find(image => image.id === selectedImageId);
 
@@ -76,7 +81,14 @@ export class App extends Component {
       <>
         <AppStyled>
           <Searchbar onSubmit={this.handleSearch} />
-          <ImageGallery imageList={images} showBigImage={this.showBigImage} />
+
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <ImageGallery imageList={images} showBigImage={this.showBigImage} />
+            // <Loader />
+          )}
+
           {isButtonVisible && <Button onClick={this.loadNextPage} />}
         </AppStyled>
         {showModal && selectedImageId && (
