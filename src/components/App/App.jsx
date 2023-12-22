@@ -3,7 +3,14 @@ import { nanoid } from 'nanoid';
 
 import * as ImageService from 'services/image-service';
 
-import { Searchbar, ImageGallery, Button, Modal, Loader } from 'components';
+import {
+  Searchbar,
+  ImageGallery,
+  Button,
+  Modal,
+  Loader,
+  ErrorMessage,
+} from 'components';
 import { AppStyled, BigImageStyled } from './App.styled';
 
 export class App extends Component {
@@ -15,7 +22,7 @@ export class App extends Component {
     isButtonVisible: false,
     showModal: false,
     selectedImageId: '',
-    isLoading: false,
+    status: null,
   };
 
   componentDidUpdate(_, prev) {
@@ -25,7 +32,7 @@ export class App extends Component {
   }
 
   handleSearch = query => {
-    this.setState({ query, images: [], page: 1, err: null });
+    this.setState({ query, images: [], page: 1, err: null, status: 'pending' });
   };
 
   scrollDown = () => {
@@ -37,22 +44,28 @@ export class App extends Component {
 
   getImages = async () => {
     const { query, page } = this.state;
-    this.setState({ isLoading: true });
+    // this.setState({ status: 'pending' });
+
     try {
       const { hits, totalHits } = await ImageService.getImages(query, page);
+
       hits.map(hit => (hit.id = nanoid()));
       this.setState(
         prev => ({
           images: [...prev.images, ...hits],
           isButtonVisible:
             this.state.page < Math.ceil(totalHits / ImageService.PER_PAGE),
+          status: totalHits === 0 ? 'rejected' : 'resolved',
+          err: totalHits === 0 ? `There is no images on query: ${query}` : null,
         }),
-        () => this.scrollDown()
+        () => {
+          setTimeout(() => {
+            this.scrollDown();
+          }, 500);
+        }
       );
     } catch (error) {
-      this.setState({ err: error });
-    } finally {
-      this.setState({ isLoading: false });
+      this.setState({ err: error, status: 'rejected' });
     }
   };
 
@@ -72,7 +85,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, showModal, isButtonVisible, selectedImageId, isLoading } =
+    const { images, showModal, isButtonVisible, selectedImageId, status, err } =
       this.state;
 
     const selectedImage = images.find(image => image.id === selectedImageId);
@@ -82,15 +95,21 @@ export class App extends Component {
         <AppStyled>
           <Searchbar onSubmit={this.handleSearch} />
 
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <ImageGallery imageList={images} showBigImage={this.showBigImage} />
-            // <Loader />
-          )}
+          {status === 'pending' && <Loader />}
 
-          {isButtonVisible && <Button onClick={this.loadNextPage} />}
+          {status === 'rejected' && <ErrorMessage message={err} />}
+
+          {status === 'resolved' && (
+            <>
+              <ImageGallery
+                imageList={images}
+                showBigImage={this.showBigImage}
+              />
+              {isButtonVisible && <Button onClick={this.loadNextPage} />}
+            </>
+          )}
         </AppStyled>
+
         {showModal && selectedImageId && (
           <Modal onClose={this.toggleModal}>
             <BigImageStyled
