@@ -44,7 +44,6 @@ export class App extends Component {
 
   getImages = async () => {
     const { query, page } = this.state;
-    // this.setState({ status: 'pending' });
 
     try {
       const { hits, totalHits } = await ImageService.getImages(query, page);
